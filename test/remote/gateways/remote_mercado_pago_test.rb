@@ -43,7 +43,8 @@ class RemoteMercadoPagoTest < Test::Unit::TestCase
       merchant_account_id: fixtures(:mercado_pago)[:merchant_account_id],
       fraud_scoring: true,
       fraud_manual_review: true,
-      payment_method_option_id: '123abc'
+      payment_method_option_id: '123abc',
+      notification_url: 'www.mercado-pago.com'
     }
   end
 
@@ -102,14 +103,6 @@ class RemoteMercadoPagoTest < Test::Unit::TestCase
     tax_amount = amount * 0.19
     @options[:net_amount] = (amount - tax_amount) / 100
     @options[:taxes] = [{ value: tax_amount / 100, type: 'IVA' }]
-
-    response = @colombian_gateway.purchase(amount, @colombian_card, @options)
-    assert_success response
-    assert_equal 'accredited', response.message
-  end
-
-  def test_successful_purchase_with_notification_url
-    @options[:notification_url] = "www.mercado_pago.com"
 
     response = @colombian_gateway.purchase(amount, @colombian_card, @options)
     assert_success response
