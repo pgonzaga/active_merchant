@@ -98,6 +98,7 @@ module ActiveMerchant #:nodoc:
         add_processing_mode(post, options)
         add_net_amount(post, options)
         add_taxes(post, options)
+        add_notification_url(options)
         post[:binary_mode] = (options[:binary_mode].nil? ? true : options[:binary_mode])
         post
       end
@@ -183,6 +184,10 @@ module ActiveMerchant #:nodoc:
         end
 
         [street_number, street_name]
+      end
+
+      def add_notification_url(post, options)
+        post[:notification_url] = options[:notification_url] if options[:notification_url]
       end
 
       def add_invoice(post, money, options)
