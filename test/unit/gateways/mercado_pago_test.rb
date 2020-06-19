@@ -33,7 +33,6 @@ class MercadoPagoTest < Test::Unit::TestCase
       order_id: '1',
       billing_address: address,
       description: 'Store Purchase',
-      notification_url: 'www.mercado-pago.com'
     }
   end
 
@@ -80,16 +79,6 @@ class MercadoPagoTest < Test::Unit::TestCase
     assert_equal 'accredited', response.message
     assert response.test?
   end
-
-  # def test_successful_purchase_with_notification_url
-  #   @gateway.expects(:ssl_post).at_most(2).returns(successful_purchase_response)
-
-  #   response = @gateway.purchase(@amount, @credit_card, @options.merge(notification_url: 'www.mercado-pago.com'))
-  #   assert_success response
-
-  #   assert_equal 'www.mercado-pago.com', response.params['notification_url']
-
-  # end
 
   def test_failed_purchase
     @gateway.expects(:ssl_post).at_most(2).returns(failed_purchase_response)
@@ -304,6 +293,16 @@ class MercadoPagoTest < Test::Unit::TestCase
 
     assert_success response
     assert_equal '4141491|1.0', response.authorization
+  end
+
+  def test_successful_purchase_with_notification_url
+    response = stub_comms do
+      @gateway.purchase(@amount, credit_card, @options.merge(notification_url: 'www.mercado-pago.com'))
+    end.check_request do |endpoint, data, headers|
+      assert_match(%r("notification_url":"www.mercado-pago.com"), data) if endpoint =~ /payments/
+    end.respond_with(successful_purchase_response)
+
+    assert_success response
   end
 
   def test_includes_deviceid_header

@@ -45,7 +45,6 @@ class RemoteMercadoPagoTest < Test::Unit::TestCase
       fraud_scoring: true,
       fraud_manual_review: true,
       payment_method_option_id: '123abc',
-      notification_url: 'www.mercado-pago.com'
     }
   end
 
@@ -108,6 +107,12 @@ class RemoteMercadoPagoTest < Test::Unit::TestCase
     response = @colombian_gateway.purchase(amount, @colombian_card, @options)
     assert_success response
     assert_equal 'accredited', response.message
+  end
+
+  def test_successful_purchase_with_notification_url
+    response = @gateway.purchase(@amount, @credit_card, @options.merge(notification_url: 'https://www.spreedly.com/'))
+    assert_success response
+    assert_equal 'https://www.spreedly.com/', response.params['notification_url']
   end
 
   def test_failed_purchase
